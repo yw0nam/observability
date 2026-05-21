@@ -1,0 +1,96 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 512
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: local
+        action: upsert
+  # Loki uses resource attributes as labels; promote service.name explicitly so the LogQL `{service_name="..."}` filter works.
+  attributes/loki:
+    actions:
+      - key: loki.resource.labels
+        value: service.name,deployment.environment
+        action: insert
+  # Strip high-cardinality / low-value labels from metrics before they reach
+  # Prometheus. Applied to ALL metrics (OpenCode + Hermes + future agents).
+  #   session_id  -> per-session series explosion. Kept on log records for
+  #                  drilldown via Loki `{service_name="..."} | session_id="..."`.
+  #   host_arch / os_type / app_version / host_name -> rarely change but
+  #                  bloat every series with redundant resource metadata.
+  # Datapoint attrs (e.g. `session_id` set by OpenCode on each metric point)
+  # need `context: datapoint`; resource-level keys handled in resource/strip.
+  transform/strip_metric_cardinality:
+    error_mode: ignore
+    metric_statements:
+      - context: datapoint
+        statements:
+          - delete_key(attributes, "session_id")
+          - delete_key(attributes, "host_arch")
+          - delete_key(attributes, "os_type")
+          - delete_key(attributes, "app_version")
+          - delete_key(attributes, "host_name")
+          - delete_key(attributes, "process_pid")
+  resource/strip_metric_cardinality:
+    attributes:
+      - key: host.arch
+        action: delete
+      - key: os.type
+        action: delete
+      - key: host.name
+        action: delete
+      - key: process.pid
+        action: delete
+  # Claude Code SDK emits monotonic sums with DELTA temporality. Prometheus
+  # remote-write only accepts CUMULATIVE — without this processor, all
+  # claude-code.* metrics are silently dropped by prometheusremotewrite.
+  # Keep close to the receiver (state-sensitive: maintains per-series running totals).
+  deltatocumulative:
+    max_stale: 5m
+
+exporters:
+  prometheusremotewrite:
+    endpoint: http://prometheus:9090/api/v1/write
+    tls:
+      insecure: true
+    resource_to_telemetry_conversion:
+      enabled: true
+  otlphttp/loki:
+    endpoint: http://loki:3100/otlp
+    tls:
+      insecure: true
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+service:
+  extensions: [health_check]
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      # deltatocumulative MUST run before batch — it needs raw delta points to
+      # accumulate running totals; batching can re-order/aggregate them.
+      processors: [deltatocumulative, batch, resource, transform/strip_metric_cardinality, resource/strip_metric_cardinality]
+      exporters: [prometheusremotewrite]
+    logs:
+      receivers: [otlp]
+      processors: [batch, resource, attributes/loki]
+      exporters: [otlphttp/loki]
+  telemetry:
+    logs:
+      level: info
+    # Collector 자체 메트릭(otelcol_*)을 8888 포트로 노출. Prometheus가 scrape하여
+    # spans/metric_points/log_records의 accepted/sent/refused/failed 카운터를 모니터링.
+    metrics:
+      address: 0.0.0.0:8888
+      level: detailed
