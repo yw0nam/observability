@@ -113,23 +113,26 @@ The `last - min` form measures the actual cumulative growth that happened **insi
 
 ## Collector pipeline
 
-```
-receivers: [otlp]
-                                                    metrics:
-                                                      processors:
-                                                        - deltatocumulative          # delta → cumulative; max_stale 5m
-                                                        - batch
-                                                        - resource                    # deployment.environment=local
-                                                        - transform/strip_metric_cardinality   # delete session_id, host_arch, os_type, ...
-                                                        - resource/strip_metric_cardinality    # same on resource keys
-                                                      exporters: [prometheusremotewrite]
+```yaml
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors:
+        - deltatocumulative                    # delta → cumulative; max_stale 5m
+        - batch
+        - resource                             # deployment.environment=local
+        - transform/strip_metric_cardinality   # delete session_id, host_arch, os_type, ...
+        - resource/strip_metric_cardinality    # same on resource-level keys
+      exporters: [prometheusremotewrite]
 
-                                                    logs:
-                                                      processors:
-                                                        - batch
-                                                        - resource
-                                                        - attributes/loki             # promote service.name → Loki label
-                                                      exporters: [otlphttp/loki]
+    logs:
+      receivers: [otlp]
+      processors:
+        - batch
+        - resource
+        - attributes/loki                      # promote service.name → Loki label
+      exporters: [otlphttp/loki]
 ```
 
 Traces pipeline is intentionally **not** wired. The collector still accepts OTLP traces at the receiver (so agents see no errors) but nothing is forwarded — there is no trace backend in this stack. Adding Grafana Tempo as a monolithic local-storage backend is the natural next step if span-level visibility becomes a need.
