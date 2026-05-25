@@ -1373,7 +1373,8 @@
     },
     {
       "id": 11,
-      "title": "Cache Efficiency",
+      "title": "Cache Hit Ratio — Selected Range",
+      "description": "Cumulative cacheRead / total tokens ratio across the entire time range selected in the timepicker. Long-window average — smooths over individual session bursts. Pair with the 'Last 1h' panel to compare overall vs recent cache effectiveness.",
       "type": "gauge",
       "gridPos": {
         "h": 8,
@@ -1444,7 +1445,7 @@
     },
     {
       "id": 17,
-      "title": "Cache Hit Ratio",
+      "title": "Cache Hit Ratio — Last 1h",
       "type": "gauge",
       "gridPos": {
         "h": 8,
@@ -1463,7 +1464,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "(sum(rate(opencode_token_usage_tokens_total{type=\"cacheRead\",service_name=~\"$service\",model=~\"$model\"}[5m])) / sum(rate(opencode_token_usage_tokens_total{service_name=~\"$service\",model=~\"$model\"}[5m]))) or vector(0)",
+          "expr": "(sum(last_over_time(opencode_token_usage_tokens_total{type=\"cacheRead\",service_name=~\"$service\",model=~\"$model\"}[1h]) - min_over_time(opencode_token_usage_tokens_total{type=\"cacheRead\",service_name=~\"$service\",model=~\"$model\"}[1h])) / sum(last_over_time(opencode_token_usage_tokens_total{service_name=~\"$service\",model=~\"$model\"}[1h]) - min_over_time(opencode_token_usage_tokens_total{service_name=~\"$service\",model=~\"$model\"}[1h]))) or vector(0)",
           "legendFormat": "cache hit ratio",
           "refId": "A",
           "queryType": "instant"
@@ -1524,7 +1525,7 @@
         },
         "displayLabels": []
       },
-      "description": "Instant cache_read / total tokens, scoped by selected $model. Window pinned to 5m because plugin-otel pushes at ~60s — shorter windows often read as 0."
+      "description": "Recent cumulative cacheRead / total tokens ratio over the last 1 hour. Uses last_over_time − min_over_time (within-window growth) instead of rate(); avoids the NaN dips that the older 5m rate() form produced when plugin-otel's ~60s push interval left rate windows with too few samples."
     },
     {
       "id": 500,
@@ -2195,8 +2196,8 @@
     {
       "id": 200,
       "type": "timeseries",
-      "title": "Cache Hit Ratio by Model",
-      "description": "Per-model breakdown of cache_read / total tokens. Window pinned to 5m for stability against plugin-otel's ~60s push interval.",
+      "title": "Cache Hit Ratio by Model — Last 1h",
+      "description": "Per-model cumulative cacheRead / total tokens ratio over the last 1 hour. Uses last_over_time − min_over_time (within-window growth) instead of rate(); compare prompt cache effectiveness across models without NaN dips from rate-window sparsity.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -2214,7 +2215,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "(sum by (model) (rate(opencode_token_usage_tokens_total{type=\"cacheRead\",service_name=~\"$service\",model=~\"$model\"}[5m])) / sum by (model) (rate(opencode_token_usage_tokens_total{service_name=~\"$service\",model=~\"$model\"}[5m]))) or vector(0)",
+          "expr": "sum by (model) (last_over_time(opencode_token_usage_tokens_total{type=\"cacheRead\",service_name=~\"$service\",model=~\"$model\"}[1h]) - min_over_time(opencode_token_usage_tokens_total{type=\"cacheRead\",service_name=~\"$service\",model=~\"$model\"}[1h])) / sum by (model) (last_over_time(opencode_token_usage_tokens_total{service_name=~\"$service\",model=~\"$model\"}[1h]) - min_over_time(opencode_token_usage_tokens_total{service_name=~\"$service\",model=~\"$model\"}[1h]))",
           "legendFormat": "{{model}}"
         }
       ],

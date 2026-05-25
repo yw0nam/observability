@@ -51,20 +51,18 @@ docker compose up -d
 open http://localhost:3002      # anonymous viewer enabled; admin/admin to edit
 ```
 
-Point an agent's OTel exporter at the collector:
+Then wire each agent (Claude Code / OpenCode / Hermes) to push OTLP at `127.0.0.1:4318`.
+Full per-agent setup, verification, and troubleshooting lives in **[docs/otel-setting.md](docs/otel-setting.md)**.
+
+TL;DR for Claude Code:
 
 ```bash
-# Claude Code
 export CLAUDE_CODE_ENABLE_TELEMETRY=1
+export OTEL_METRICS_EXPORTER=otlp
+export OTEL_LOGS_EXPORTER=otlp
 export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 export OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318
-
-# OpenCode (with @devtheops/opencode-plugin-otel)
-export OPENCODE_OTLP_ENDPOINT=http://127.0.0.1:4318
-export OPENCODE_OTLP_PROTOCOL=http/protobuf
 ```
-
-Hermes ships with native OTLP wiring; point its `OTEL_EXPORTER_OTLP_ENDPOINT` at the same address.
 
 ## Dashboards
 
