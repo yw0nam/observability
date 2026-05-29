@@ -306,7 +306,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum((last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range]) - min_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range])))",
+          "expr": "sum(last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range]))",
           "legendFormat": "Cost",
           "range": true,
           "refId": "A"
@@ -1056,7 +1056,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "topk(10, sum((last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range]) - min_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range]))) by (user_email))",
+          "expr": "topk(10, sum(last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range])) by (user_email))",
           "legendFormat": "{{user_email}}",
           "range": true,
           "refId": "A"
@@ -1202,7 +1202,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "topk(10, sum((last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range]) - min_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range]))) by (session_id))",
+          "expr": "topk(10, sum(last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range])) by (session_id))",
           "legendFormat": "{{session_id}}",
           "range": true,
           "refId": "A"
@@ -1275,7 +1275,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "topk(10, sum((last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\", git_repo!=\"\"}[$__range]) - min_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\", git_repo!=\"\"}[$__range]))) by (git_repo))",
+          "expr": "topk(10, sum(last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\", git_repo!=\"\"}[$__range])) by (git_repo))",
           "legendFormat": "{{git_repo}}",
           "range": true,
           "refId": "A"
@@ -1347,7 +1347,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum((last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range]) - min_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range]))) by (model)",
+          "expr": "sum(last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range])) by (model)",
           "legendFormat": "{{model}}",
           "range": true,
           "refId": "A"
@@ -1602,7 +1602,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__rate_interval])) * 3600",
+          "expr": "sum(rate(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[5m])) * 3600",
           "legendFormat": "Cost $/hour",
           "range": true,
           "refId": "A"
@@ -1700,7 +1700,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__rate_interval])) by (model) * 3600",
+          "expr": "sum(rate(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[5m])) by (model) * 3600",
           "legendFormat": "{{model}}",
           "range": true,
           "refId": "A"
@@ -2442,7 +2442,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum((last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range]) - min_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range]))) by (query_source)",
+          "expr": "sum(last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range])) by (query_source)",
           "legendFormat": "{{query_source}}",
           "range": true,
           "refId": "A"
@@ -2514,7 +2514,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum((last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range]) - min_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range]))) by (effort)",
+          "expr": "sum(last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__range])) by (effort)",
           "legendFormat": "{{effort}}",
           "range": true,
           "refId": "A"
