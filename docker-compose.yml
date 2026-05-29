@@ -15,11 +15,18 @@ services:
     container_name: obs-otel-collector
     restart: unless-stopped
     command: ["--config=/etc/otelcol/config.yaml"]
+    environment:
+      # Bearer token enforced on the OTLP receivers. Set in .env (gitignored);
+      # compose refuses to start the collector if it is missing.
+      OTEL_AUTH_TOKEN: ${OTEL_AUTH_TOKEN:?OTEL_AUTH_TOKEN is required — copy .env.example to .env and set a token}
     volumes:
       - ./otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
     ports:
-      - "127.0.0.1:4317:4317"
-      - "127.0.0.1:4318:4318"
+      # OTLP ingestion is exposed on all interfaces so other machines (and a
+      # front-facing reverse proxy) can reach it. The bearer token is the gate.
+      - "0.0.0.0:4317:4317"
+      - "0.0.0.0:4318:4318"
+      # Health check / self-metrics stay loopback-only; no auth on these.
       - "127.0.0.1:13133:13133"
       # Collector 자체 메트릭(otelcol_*) - Prometheus가 같은 docker network에서 scrape하므로
       # 외부 host 노출은 디버깅 용도로만 필요. 127.0.0.1에 한정.

@@ -3,8 +3,15 @@ receivers:
     protocols:
       grpc:
         endpoint: 0.0.0.0:4317
+        # Require Authorization: Bearer <OTEL_AUTH_TOKEN> on every incoming RPC.
+        # Applies to remote senders AND the local Hermes plugin (it picks the token
+        # up automatically via the standard OTEL_EXPORTER_OTLP_HEADERS env var).
+        auth:
+          authenticator: bearertokenauth
       http:
         endpoint: 0.0.0.0:4318
+        auth:
+          authenticator: bearertokenauth
 
 processors:
   batch:
@@ -54,8 +61,14 @@ processors:
   # remote-write only accepts CUMULATIVE — without this processor, all
   # claude-code.* metrics are silently dropped by prometheusremotewrite.
   # Keep close to the receiver (state-sensitive: maintains per-series running totals).
+  # max_stale raised 5m -> 1h: Claude Code emits per-(session x query_source x
+  # skill x agent) delta streams; sub-agent/skill streams go idle >5m mid-session,
+  # get evicted, then restart cumulative from 0 -> spurious counter resets that
+  # make increase() over-count AND last_over_time under-count (verified:
+  # 104/400 claude cost series reset over 30d, ~$316 of real spend discarded).
+  # 1h survives normal mid-session idle gaps so series stay monotonic per session.
   deltatocumulative:
-    max_stale: 5m
+    max_stale: 1h
 
 exporters:
   prometheusremotewrite:
@@ -68,13 +81,24 @@ exporters:
     endpoint: http://loki:3100/otlp
     tls:
       insecure: true
+  debug/traces:
+    verbosity: normal
+    sampling_initial: 5
+    sampling_thereafter: 200
 
 extensions:
   health_check:
     endpoint: 0.0.0.0:13133
+  # Static bearer token validated on the OTLP receivers above. Token value comes
+  # from the OTEL_AUTH_TOKEN env var (injected by docker-compose from .env, never
+  # committed). Default scheme is "Bearer", so clients send:
+  #   Authorization: Bearer <OTEL_AUTH_TOKEN>
+  # NOTE: 0.116.1 supports a single token only; `tokens:` (multiple) needs >=0.122.
+  bearertokenauth:
+    token: ${env:OTEL_AUTH_TOKEN}
 
 service:
-  extensions: [health_check]
+  extensions: [health_check, bearertokenauth]
   pipelines:
     metrics:
       receivers: [otlp]
@@ -86,6 +110,10 @@ service:
       receivers: [otlp]
       processors: [batch, resource, attributes/loki]
       exporters: [otlphttp/loki]
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug/traces]
   telemetry:
     logs:
       level: info

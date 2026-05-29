@@ -10,3 +10,6 @@ wheels/
 .venv
 .sisyphus
 reports/
+
+# Secrets — OTEL_AUTH_TOKEN etc. (.env.example is committed as a template)
+.env

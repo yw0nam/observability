@@ -8,17 +8,32 @@ what environment variables to set, where to set them, and how to verify the data
 
 ## Collector endpoint summary
 
-The OTel collector is reachable on the loopback interface only:
+The OTLP receivers are exposed on **all interfaces** (`0.0.0.0`), so other machines on the
+LAN/VPN — and a front-facing reverse proxy — can reach them. Replace `<COLLECTOR_HOST>` with
+the collector machine's IP or hostname (use `127.0.0.1` when the sender runs on the same box).
 
 | Protocol | Endpoint | Port | Use when |
 |---|---|---|---|
-| OTLP gRPC | `http://127.0.0.1:4317` | 4317 | Default for many native OTel SDKs |
-| OTLP HTTP / protobuf | `http://127.0.0.1:4318` | 4318 | Used by Claude Code, recommended for OpenCode |
-| Health check | `http://127.0.0.1:13133` | 13133 | Verify collector is up |
+| OTLP gRPC | `http://<COLLECTOR_HOST>:4317` | 4317 | Default for many native OTel SDKs (Hermes) |
+| OTLP HTTP / protobuf | `http://<COLLECTOR_HOST>:4318` | 4318 | Used by Claude Code, recommended for OpenCode |
+| Health check | `http://127.0.0.1:13133` | 13133 | Verify collector is up (loopback-only, no auth) |
 
 Container-to-container senders inside the same docker network use the service name `obs-otel-collector:4317` or `:4318` instead.
 
-There is no authentication on the OTLP endpoints — the stack assumes a trusted local environment and binds to loopback only.
+### Authentication (required)
+
+Both OTLP receivers enforce a **static bearer token**. Every sender must present:
+
+```
+Authorization: Bearer <OTEL_AUTH_TOKEN>
+```
+
+- The token lives in `.env` on the collector host (`OTEL_AUTH_TOKEN=...`, gitignored). Generate one with `openssl rand -hex 32` and `docker compose up -d`.
+- Requests without a valid token are rejected with **HTTP 401** (gRPC `UNAUTHENTICATED`).
+- This stack (collector 0.116.1) supports a **single** shared token; per-machine tokens require collector ≥ 0.122.
+- The token travels in plaintext over HTTP/gRPC — fine on a trusted LAN/VPN. For untrusted networks, terminate TLS at a reverse proxy in front of the collector.
+
+The exact env var to carry this header differs per agent — see each section below.
 
 ---
 
@@ -38,9 +53,13 @@ export OTEL_LOGS_EXPORTER=otlp
 export OTEL_LOGS_INCLUDE_USER_PROMPTS=1     # optional: include user prompts in logs
 
 export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-export OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://<COLLECTOR_HOST>:4318
+
+# Required — the collector rejects unauthenticated pushes with HTTP 401.
+export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer <OTEL_AUTH_TOKEN>"
 ```
 
+Use `127.0.0.1` for `<COLLECTOR_HOST>` if Claude Code runs on the collector machine; otherwise its LAN IP/hostname.
 Start a fresh terminal so the env vars are picked up, then run Claude Code as usual.
 
 ### Optional resource attributes
@@ -96,8 +115,9 @@ Drop these into `~/.config/opencode/otel.env` (or your shell profile):
 
 ```bash
 export OPENCODE_ENABLE_TELEMETRY=1
-export OPENCODE_OTLP_ENDPOINT="http://127.0.0.1:4318"
+export OPENCODE_OTLP_ENDPOINT="http://<COLLECTOR_HOST>:4318"
 export OPENCODE_OTLP_PROTOCOL="http/protobuf"
+export OPENCODE_OTLP_HEADERS="Authorization=Bearer <OTEL_AUTH_TOKEN>"   # required
 export OPENCODE_RESOURCE_ATTRIBUTES="service.name=opencode,deployment.environment=local"
 ```
 
@@ -120,7 +140,7 @@ The plugin exposes more env vars; the defaults are sensible but useful to know:
 | `OPENCODE_DISABLE_METRICS` | (unset) | Comma-separated metric names to skip |
 | `OPENCODE_DISABLE_TRACES` | (unset) | Comma-separated span names to skip |
 | `OPENCODE_METRIC_PREFIX` | `opencode.` | Prefix prepended to every metric name |
-| `OPENCODE_OTLP_HEADERS` | (unset) | Headers like `Authorization=Bearer ...` — not needed for this local stack |
+| `OPENCODE_OTLP_HEADERS` | (unset) | **Required** here — carries `Authorization=Bearer <OTEL_AUTH_TOKEN>` (set above) |
 
 ### Verify
 
@@ -174,6 +194,20 @@ export HERMES_OTEL_ENDPOINT=obs-otel-collector:4317
 ```
 
 Note the **gRPC port (4317)** — unlike OpenCode which is wired to HTTP/protobuf (4318), this plugin uses gRPC.
+
+#### Bearer token (required)
+
+The plugin has no auth env var of its own, but it builds the OTLP exporter **without an explicit
+`headers=` argument** (`runtime_core.py`), so the OpenTelemetry Python SDK falls back to the standard
+env var. Set it and the token rides along as gRPC metadata:
+
+```bash
+export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer <OTEL_AUTH_TOKEN>"
+```
+
+This is required even for a local Hermes on the same host — auth is enforced on the gRPC receiver too,
+so without it the plugin's exports get `UNAUTHENTICATED` and silently fail open (Hermes keeps running,
+no metrics appear). For a remote Hermes also point `HERMES_OTEL_ENDPOINT=<COLLECTOR_HOST>:4317`.
 
 ### Emitted metrics
 
