@@ -9,15 +9,15 @@ No external SaaS. No data leaves the host.
 ## Architecture
 
 ```
-┌──────────────┐   OTLP gRPC :4317
+┌──────────────┐   OTLP HTTP
 │ Claude Code  │ ──────────────┐
-└──────────────┘               │
+└──────────────┘  :4318        │
 ┌──────────────┐   OTLP HTTP   ▼
 │   OpenCode   │ ──────►  ┌─────────────────────┐  remote_write   ┌──────────────┐
 └──────────────┘  :4318   │  obs-otel-collector │ ─────────────►  │  Prometheus  │
 ┌──────────────┐          │   (deltatocumulative│                 │   :9090      │
 │    Hermes    │ ──────►  │    + cardinality    │                 │   30d TSDB   │
-└──────────────┘          │    + loki promote)  │                 └──────────────┘
+└──────────────┘  :4317   │    + loki promote)  │                 └──────────────┘
                           └─────────┬───────────┘
                                     │ OTLP HTTP
                                     ▼
@@ -122,7 +122,7 @@ service:
     metrics:
       receivers: [otlp]
       processors:
-        - deltatocumulative                    # delta → cumulative; max_stale 5m
+        - deltatocumulative                    # delta → cumulative; max_stale 1h
         - batch
         - resource                             # deployment.environment=local
         - transform/strip_metric_cardinality   # delete session_id, host_arch, os_type, ...
@@ -165,5 +165,5 @@ Traces pipeline is intentionally **not** wired. The collector still accepts OTLP
 
 - **Prometheus retention** is 30 days, but metric series identity is keyed on `session_id`, so abandoned sessions stop receiving samples after their TTL and effectively age out of `last_over_time` lookups well before retention.
 - **Loki staleness**: container-side `service_name` label is promoted from the OTel `service.name` resource attribute via the `attributes/loki` processor. Use `{service_name="claude-code"} | session_id="..."` to drill from a metric panel into the exact session's logs.
-- **Cardinality control**: high-churn labels (`host.arch`, `os.type`, `host.name`, `process.pid`, `app_version`) are stripped before `prometheusremotewrite`. `session_id` is intentionally kept because metric panels rely on it for per-session breakdowns; this is what drives the special PromQL patterns described above.
+- **Cardinality control**: high-churn labels (`host.arch`, `os.type`, `host.name`, `process.pid`, `app_version`) are stripped before `prometheusremotewrite`. `session_id` is intentionally kept at the **resource attribute** level (how Claude Code emits it), which survives `resource_to_telemetry_conversion` into Prometheus labels. It is stripped from **datapoint attributes** (how OpenCode emits it) to prevent per-series fanout from that path. This is what drives the special PromQL patterns described above.
 - **Grafana renderer** is wired through `GF_RENDERING_SERVER_URL` so PDF/PNG dashboard exports work out of the box (used to generate the screenshots in this README).
