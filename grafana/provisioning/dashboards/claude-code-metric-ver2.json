@@ -93,10 +93,10 @@
     {
       "collapsed": false,
       "gridPos": {
-        "h": 1,
-        "w": 24,
         "x": 0,
-        "y": 0
+        "y": 0,
+        "w": 24,
+        "h": 1
       },
       "id": 1,
       "panels": [],
@@ -131,10 +131,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 3,
         "x": 0,
-        "y": 1
+        "y": 1,
+        "w": 3,
+        "h": 3
       },
       "id": 2,
       "options": {
@@ -200,10 +200,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 3,
         "x": 3,
-        "y": 1
+        "y": 1,
+        "w": 3,
+        "h": 3
       },
       "id": 3,
       "options": {
@@ -277,10 +277,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 3,
         "x": 6,
-        "y": 1
+        "y": 1,
+        "w": 3,
+        "h": 3
       },
       "id": 4,
       "options": {
@@ -346,10 +346,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 3,
         "x": 9,
-        "y": 1
+        "y": 1,
+        "w": 3,
+        "h": 3
       },
       "id": 5,
       "options": {
@@ -415,10 +415,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 3,
         "x": 12,
-        "y": 1
+        "y": 1,
+        "w": 3,
+        "h": 3
       },
       "id": 6,
       "options": {
@@ -484,10 +484,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 3,
         "x": 15,
-        "y": 1
+        "y": 1,
+        "w": 3,
+        "h": 3
       },
       "id": 7,
       "options": {
@@ -553,10 +553,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 3,
         "x": 18,
-        "y": 1
+        "y": 1,
+        "w": 3,
+        "h": 3
       },
       "id": 8,
       "options": {
@@ -622,10 +622,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 3,
         "x": 21,
-        "y": 1
+        "y": 1,
+        "w": 3,
+        "h": 3
       },
       "id": 9,
       "options": {
@@ -721,10 +721,10 @@
         ]
       },
       "gridPos": {
-        "h": 6,
-        "w": 8,
         "x": 0,
-        "y": 5
+        "y": 4,
+        "w": 8,
+        "h": 5
       },
       "id": 10,
       "options": {
@@ -850,10 +850,10 @@
         ]
       },
       "gridPos": {
-        "h": 6,
-        "w": 8,
         "x": 8,
-        "y": 5
+        "y": 4,
+        "w": 8,
+        "h": 5
       },
       "id": 11,
       "options": {
@@ -949,10 +949,10 @@
         ]
       },
       "gridPos": {
-        "h": 6,
-        "w": 8,
         "x": 16,
-        "y": 5
+        "y": 4,
+        "w": 8,
+        "h": 5
       },
       "id": 12,
       "options": {
@@ -993,10 +993,10 @@
     {
       "collapsed": false,
       "gridPos": {
-        "h": 1,
-        "w": 24,
         "x": 0,
-        "y": 11
+        "y": 9,
+        "w": 24,
+        "h": 1
       },
       "id": 23,
       "panels": [],
@@ -1029,10 +1029,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
-        "w": 6,
         "x": 0,
-        "y": 12
+        "y": 10,
+        "w": 8,
+        "h": 9
       },
       "id": 24,
       "options": {
@@ -1103,10 +1103,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
-        "w": 6,
-        "x": 6,
-        "y": 12
+        "x": 8,
+        "y": 10,
+        "w": 8,
+        "h": 9
       },
       "id": 25,
       "options": {
@@ -1177,10 +1177,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
-        "w": 6,
-        "x": 12,
-        "y": 12
+        "x": 16,
+        "y": 10,
+        "w": 8,
+        "h": 9
       },
       "id": 26,
       "options": {
@@ -1230,80 +1230,6 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "Top 10 repositories by total cost in the selected time range. Requires the shell that launches Claude to set `OTEL_RESOURCE_ATTRIBUTES=git.repo=<name>` (e.g., via a wrapper that runs `git rev-parse --show-toplevel`). Empty until that attribute is being emitted.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "currencyUSD"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 6,
-        "x": 18,
-        "y": 12
-      },
-      "id": 34,
-      "options": {
-        "displayMode": "gradient",
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "maxVizHeight": 300,
-        "minVizHeight": 16,
-        "minVizWidth": 8,
-        "namePlacement": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showUnfilled": true,
-        "sizing": "auto",
-        "valueMode": "color"
-      },
-      "pluginVersion": "12.4.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "topk(10, sum(last_over_time(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\", git_repo!=\"\"}[$__range])) by (git_repo))",
-          "legendFormat": "{{git_repo}}",
-          "range": false,
-          "refId": "A",
-          "instant": true
-        }
-      ],
-      "title": "Top Repos by Cost",
-      "type": "bargauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
       "description": "Cost distribution across different Claude models",
       "fieldConfig": {
         "defaults": {
@@ -1323,10 +1249,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 0,
-        "y": 15
+        "y": 19,
+        "w": 8,
+        "h": 8
       },
       "id": 27,
       "options": {
@@ -1396,10 +1322,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 8,
-        "y": 15
+        "y": 19,
+        "w": 8,
+        "h": 8
       },
       "id": 28,
       "options": {
@@ -1469,10 +1395,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 16,
-        "y": 15
+        "y": 19,
+        "w": 8,
+        "h": 8
       },
       "id": 29,
       "options": {
@@ -1521,10 +1447,10 @@
     {
       "collapsed": false,
       "gridPos": {
-        "h": 1,
-        "w": 24,
         "x": 0,
-        "y": 23
+        "y": 27,
+        "w": 24,
+        "h": 1
       },
       "id": 13,
       "panels": [],
@@ -1536,7 +1462,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "Estimated cost rate over time (USD per hour)",
+      "description": "Cost incurred over time, bucketed by the graph interval. The legend total matches the Total Cost stat above.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1591,10 +1517,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 24
+        "y": 28,
+        "w": 12,
+        "h": 8
       },
       "id": 14,
       "options": {
@@ -1620,8 +1546,8 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[5m])) * 3600",
-          "legendFormat": "Cost $/hour",
+          "expr": "sum(increase(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__interval]))",
+          "legendFormat": "Cost",
           "range": true,
           "refId": "A"
         }
@@ -1689,10 +1615,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 12,
-        "y": 24
+        "y": 28,
+        "w": 12,
+        "h": 8
       },
       "id": 15,
       "options": {
@@ -1718,7 +1644,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[5m])) by (model) * 3600",
+          "expr": "sum(increase(claude_code_cost_usage_USD_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__interval])) by (model)",
           "legendFormat": "{{model}}",
           "range": true,
           "refId": "A"
@@ -1732,7 +1658,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "Token consumption rate by type (input, output, cacheRead, cacheCreation)",
+      "description": "Token consumption over time by type (input, output, cacheRead, cacheCreation). The legend total matches the Total Tokens stat above.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1848,10 +1774,10 @@
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 32
+        "y": 36,
+        "w": 12,
+        "h": 8
       },
       "id": 16,
       "options": {
@@ -1877,7 +1803,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(claude_code_token_usage_tokens_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__rate_interval])) by (type)",
+          "expr": "sum(increase(claude_code_token_usage_tokens_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__interval])) by (type)",
           "legendFormat": "{{type}}",
           "range": true,
           "refId": "A"
@@ -1891,7 +1817,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "Token consumption rate by Claude model",
+      "description": "Token consumption over time by Claude model. The legend total matches the Total Tokens stat above.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1946,10 +1872,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 12,
-        "y": 32
+        "y": 36,
+        "w": 12,
+        "h": 8
       },
       "id": 17,
       "options": {
@@ -1975,7 +1901,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(claude_code_token_usage_tokens_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__rate_interval])) by (model)",
+          "expr": "sum(increase(claude_code_token_usage_tokens_total{organization_id=~\"$organization\", user_email=~\"$user\", model=~\"$model\"}[$__interval])) by (model)",
           "legendFormat": "{{model}}",
           "range": true,
           "refId": "A"
@@ -1987,10 +1913,10 @@
     {
       "collapsed": false,
       "gridPos": {
-        "h": 1,
-        "w": 24,
         "x": 0,
-        "y": 40
+        "y": 44,
+        "w": 24,
+        "h": 1
       },
       "id": 18,
       "panels": [],
@@ -2088,10 +2014,10 @@
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 24,
         "x": 0,
-        "y": 41
+        "y": 45,
+        "w": 24,
+        "h": 8
       },
       "id": 20,
       "options": {
@@ -2217,10 +2143,10 @@
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 49
+        "y": 53,
+        "w": 12,
+        "h": 8
       },
       "id": 21,
       "options": {
@@ -2346,10 +2272,10 @@
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 12,
-        "y": 49
+        "y": 53,
+        "w": 12,
+        "h": 8
       },
       "id": 22,
       "options": {
@@ -2387,10 +2313,10 @@
     {
       "collapsed": false,
       "gridPos": {
-        "h": 1,
-        "w": 24,
         "x": 0,
-        "y": 57
+        "y": 61,
+        "w": 24,
+        "h": 1
       },
       "id": 30,
       "panels": [],
@@ -2421,10 +2347,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 0,
-        "y": 58
+        "y": 62,
+        "w": 8,
+        "h": 8
       },
       "id": 31,
       "options": {
@@ -2494,10 +2420,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 8,
-        "y": 58
+        "y": 62,
+        "w": 8,
+        "h": 8
       },
       "id": 32,
       "options": {
@@ -2583,10 +2509,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
         "x": 16,
-        "y": 58
+        "y": 62,
+        "w": 8,
+        "h": 8
       },
       "id": 33,
       "options": {
