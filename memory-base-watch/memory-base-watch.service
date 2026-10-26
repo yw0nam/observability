@@ -1,0 +1,10 @@
+[Unit]
+Description=Urgent YUI signal when a memory_base_* container dies or turns unhealthy
+
+[Service]
+ExecStart=%h/observability/memory-base-watch/watch.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
